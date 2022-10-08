@@ -1,5 +1,10 @@
 package com.example.cloudfacecounter
 
+//import aws.sdk.kotlin.services.s3.*
+//import aws.sdk.kotlin.services.s3.model.PutObjectRequest
+//import aws.sdk.kotlin.services.s3.model.ListObjectsV2Request
+//import aws.sdk.kotlin.runtime.auth.credentials.*
+//import com.amazonaws.auth.BasicAWSCredentials
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
@@ -7,11 +12,11 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
-import aws.sdk.kotlin.services.s3.*
-import aws.sdk.kotlin.services.s3.model.PutObjectRequest
-import aws.smithy.kotlin.runtime.content.asByteStream
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.s3.model.S3Object
+import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.example.cloudfacecounter.databinding.ActivityMainBinding
-import kotlinx.coroutines.runBlocking
 import java.io.File
 
 
@@ -44,13 +49,34 @@ class MainActivity : AppCompatActivity() {
             val imageBitmap = data?.extras?.get("data") as Bitmap
             binding.imgViewer.setImageBitmap(imageBitmap)
 
+//            val session = runBlocking {
+//                this@MainActivity.readBucket()
+//            }
+
+//            val session = runBlocking {
+//                readBucketOld()
+//            }
+
+            Thread {
+
+                    readBucketOld()
+
+                runOnUiThread {
+                    // Post the result to the main thread
+                }
+            }.start()
+
+
+
+
+
             val file_path = Environment.getExternalStorageDirectory().absolutePath
 //                    "/imagestorage"
 
-            File(file_path, "map.png").writeBitmap(imageBitmap, Bitmap.CompressFormat.PNG, 85)
-            val session = runBlocking {
-                putS3Object("igor-cloud-face-counter", "facestest.jpg", file_path+"/map.png")
-            }
+//            File(file_path, "map.png").writeBitmap(imageBitmap, Bitmap.CompressFormat.PNG, 85)
+//            val session = runBlocking {
+//                putS3Object("igor-cloud-face-counter", "facestest.jpg", file_path+"/map.png")
+//            }
 
 
         }
@@ -63,27 +89,48 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    suspend fun putS3Object(bucketName: String, objectKey: String, objectPath: String) {
+    fun readBucketOld(){
+        var creds = BasicAWSCredentials("AKIATLEIOXNXOO7TT56V", "+hk8F6sB3PO6C/jjjMcaYT8e1IfVWfcKcoJOAahL")
+        var s3Client1 = AmazonS3Client(creds)
+        val responseRead = s3Client1.listObjectsV2(/* bucketName = */ "igor-cloud-face-counter")
 
-        val metadataVal = mutableMapOf<String, String>()
-        metadataVal["myVal"] = "test"
+        println(responseRead.getObjectSummaries())
 
-        val request = PutObjectRequest {
-            bucket = bucketName
-            key = objectKey
-            metadata = metadataVal
-            body = File(objectPath).asByteStream()
-        }
 
-        S3Client.fromEnvironment { region = "eu-west-1" }.use { s3 ->
-            val response = s3.putObject(request)
-            println("Tag information is ${response.eTag}")
-        }
+    }
+
+//    suspend fun readBucket(){
+//
+//        val s3 = S3Client.fromEnvironment { region = "eu-west-1"}
+//        val reqRead = ListObjectsV2Request {
+//            bucket = "igor-cloud-face-counter"
+//        }
+//        val responseRead = s3.listObjectsV2(reqRead)
+//        responseRead.contents?.forEach {println(it.key)}
+//
+//    }
+//
+//    suspend fun putS3Object(bucketName: String, objectKey: String, objectPath: String) {
+//
+//        val metadataVal = mutableMapOf<String, String>()
+//        metadataVal["myVal"] = "test"
+//
+//        val request = PutObjectRequest {
+//            bucket = bucketName
+//            key = objectKey
+//            metadata = metadataVal
+//            body = File(objectPath).asByteStream()
+//        }
+//
+//        val s3 = S3Client.fromEnvironment { region = "eu-west-1"}
+//        s3.putObject(request)
+
+//        S3Client.fromEnvironment { region = "eu-west-1" }.use { s3 ->
+//            val response = s3.putObject(request)
+//            println("Tag information is ${response.eTag}")
+//        }
 
     }
 
 
-
-
-}
 

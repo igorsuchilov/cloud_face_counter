@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun readBucketOld(){
-        var creds = BasicAWSCredentials("AKIATLEIOXNXOO7TT56V", "+hk8F6sB3PO6C/jjjMcaYT8e1IfVWfcKcoJOAahL")
+        var creds = BasicAWSCredentials("______", "______")
         var s3Client1 = AmazonS3Client(creds)
         val responseRead = s3Client1.listObjectsV2(/* bucketName = */ "igor-cloud-face-counter")
 

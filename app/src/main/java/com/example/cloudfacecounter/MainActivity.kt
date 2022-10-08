@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import com.example.cloudfacecounter.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+    val test
     val REQUEST_IMAGE_CAPTURE = 1
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
